@@ -7,7 +7,7 @@ import { useState } from "react"
 
 async function generateWallets(walletCount, separator) {
   // Initialize the SDK for Tezos
-  const tatumSdk = await TatumSDK.init({ network: Network.TEZOS, configureWalletProviders: [{ type: TezosWalletProvider, config: { rpcUrl: "https://mainnet.ecadinfra.com" } }] })
+  const tatumSdk = await TatumSDK.init({ network: Network.TEZOS, configureWalletProviders: [{ type: TezosWalletProvider, config: { rpcUrl: "https://mainnet.tezos.ecadinfra.com" } }] })
 
   let walletData = []
 
@@ -50,7 +50,7 @@ async function generateWallets(walletCount, separator) {
 }
 
 export default function Home() {
-  const [walletCount, setWalletCount] = useState(10)
+  const [walletCount, setWalletCount] = useState(100)
   const [separator, setSeparator] = useState(',')
   const [isGenerating, setIsGenerating] = useState(false)
 
@@ -82,13 +82,13 @@ export default function Home() {
             {/* Nombre de wallets */}
             <div>
               <label htmlFor="walletCount" className="block text-sm font-medium text-gray-700 mb-2">
-                Number of wallets to generate
+                Number of wallets to generate (max 9999)
               </label>
               <input
                 type="number"
                 id="walletCount"
                 min="1"
-                max="1000"
+                max="9999"
                 value={walletCount}
                 onChange={(e) => setWalletCount(parseInt(e.target.value) || 0)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -116,7 +116,6 @@ export default function Home() {
               </select>
             </div>
 
-            {/* Bouton de génération */}
             <button
               type="button"
               onClick={handleGenerate}
