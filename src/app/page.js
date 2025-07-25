@@ -1,22 +1,29 @@
 "use client"
 
 // Import necessary libraries
-import { TezosWalletProvider } from "@tatumio/tezos-wallet-provider"
-import { TatumSDK, Network } from "@tatumio/tatum"
+import { InMemorySigner } from "@taquito/signer"
 import { useState } from "react"
 
-async function generateWallets(walletCount, separator) {
-  // Initialize the SDK for Tezos
-  const tatumSdk = await TatumSDK.init({ network: Network.TEZOS, configureWalletProviders: [{ type: TezosWalletProvider, config: { rpcUrl: "https://mainnet.tezos.ecadinfra.com" } }] })
+import * as bip39 from '@scure/bip39';
+import { wordlist } from "@scure/bip39/wordlists/english"
 
+async function generateWallets(walletCount, separator) {
   let walletData = []
 
   for (let i = 0; i < walletCount; i++) {
-    // Get private key, address and mnemonic
-    const { privateKey, address, mnemonic } = await tatumSdk.walletProvider.use(TezosWalletProvider).getWallet()
+    // Generate a new mnemonic (12 words)
+    const mnemonic = bip39.generateMnemonic(wordlist)
+    // Create a signer from the mnemonic
+    const signer = InMemorySigner.fromMnemonic({
+      mnemonic: mnemonic
+    })
+
+    // Get the private key and public key hash (address)
+    const privateKey = await signer.secretKey()
+    const address = await signer.publicKeyHash()
 
     if (separator === 'json') {
-      walletData.push({ wallet: address, key: privateKey })
+      walletData.push({ wallet: address, key: privateKey, mnemonic: mnemonic })
     } else {
       walletData.push(`${address}${separator}${privateKey}`)
     }
